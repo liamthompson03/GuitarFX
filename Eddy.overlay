@@ -1,0 +1,25 @@
+&i2c0 {
+    ioexpander:nRF52840@20{
+        compatible = "i2c-device"; //Raw I2C connection
+        reg = < 0x20 >;
+        label = "IOEXPANDER";
+    };
+
+    adc_dev:nRF52840@21{
+        compatible = "i2c-device";
+        reg = < 0x21 >;
+        label = "ADC_DEV";
+    }; 
+};
+
+&i2c1 {
+    ioboard:nRF52840@80{
+        compatible = "i2c-device";
+        reg = < 0x80 >;
+        label = "IOBOARD";
+    };
+};
+
+&spi0 {										/* m */
+	status = "disabled";					/* n */
+};
