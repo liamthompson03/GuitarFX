@@ -26,7 +26,7 @@
 			label = "Out 0";
 		};
 		led1: led_1 {
-			gpios = <&gpio0 2 GPIO_ACTIVE_HIGH>;
+			gpios = <&gpio0 2 GPIO_ACTIVE_LOW>;
 			label = "Out 1";
 		};
 	};

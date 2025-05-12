@@ -88,6 +88,14 @@ int main(void)
                 return 0;
         }
 
+        // Initialize ADC 
+        uint8_t data_adc[2] = {0x00, 0x08};
+        uint8_t* data_adc_addr = data_adc;
+        ret = i2c_burst_write_dt(&adc_dev, 0x82, data_adc_addr, 2);
+        if (ret != 0) {
+                return 1;
+        }
+
         ret = i2c_read_dt(&ioexpander_dev, &data_zero, sizeof(data_zero));
         if(ret != 0){
                 return 1;
@@ -99,27 +107,26 @@ int main(void)
         };
 
         // Register I2C target device
-        if(i2c_target_register(ioboard, &target_cfg) < 0) {
-                return 1;
-        }
-
+        // if(i2c_target_register(ioboard, &target_cfg) < 0) {
+        //         return 1;
+        // }
+                                        /* MAIN LOOP */
         while (1) {
                 ret = i2c_read_dt(&ioexpander_dev, &data_io, sizeof(data_io));
                 if(ret != 0){
                         return 1;
                 }
 
-                // ret = gpio_pin_toggle_dt(&led1);
-		// if (ret < 0) {
-		// 	return 1;
-		// }
+                ret = i2c_burst_read_dt(&adc_dev, 0x80, data_adc_addr, 2);
+                if(ret != 0){
+                        return 1;
+                }
 
-                // if(data_io != 0x00) {
-                //         ret = gpio_pin_toggle_dt(&led0);
-                //         if (ret < 0) {
-                //                 return 1;
-                //         }
-                // }
+                if((data_adc[0] & 0x3F) > 0x01) {
+                        gpio_pin_set_dt(&led1, 1);
+                } else {
+                        gpio_pin_set_dt(&led1, 0);
+                }
 
                 if(data_io != data_io_old && data_io != data_zero) {
                         ret = gpio_pin_toggle_dt(&led0);
@@ -127,11 +134,6 @@ int main(void)
                                 return 1;
                         }
                 }
-
-                // ret = gpio_pin_toggle_dt(&led1);
-		// if (ret < 0) {
-		// 	return 1;
-		// }
                 data_io_old = data_io;
                 k_msleep(SLEEP_TIME_MS);
         }
